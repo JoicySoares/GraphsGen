@@ -58,7 +58,7 @@ void designText (cairo_t * context, Graphic * graphic, int height, int width){
   	cairo_set_font_size(context, width/25);
 	cairo_move_to(context, width - (width/2), height/20);
   	cairo_show_text(context, graphic->name);
-  	/*cairo_select_font_face(context, "Times New Roman",CAIRO_FONT_SLANT_ITALIC,CAIRO_FONT_WEIGHT_BOLD);
+  	cairo_select_font_face(context, "Times New Roman",CAIRO_FONT_SLANT_ITALIC,CAIRO_FONT_WEIGHT_BOLD);
   	cairo_set_font_size(context, width/40);
     cairo_move_to(context, width - (width/8), height - (height/13));
 	cairo_show_text(context, "x"); 
@@ -67,7 +67,7 @@ void designText (cairo_t * context, Graphic * graphic, int height, int width){
     cairo_show_text(context, "y"); 
     cairo_set_font_size(context, width/40);
 	cairo_move_to(context, width/12, height - (height/12)); 
-    cairo_show_text(context, "0"); */
+    cairo_show_text(context, "0"); 
 
 }
 void designDot(cairo_t *context,Graphic * graphic, int x, int y) {
@@ -143,3 +143,50 @@ void designArea(cairo_t * context, Graphic * graphic, int Yorigem){
     cairo_restore(context);
 }
 
+//Vamos criar o Gráfico !
+void createGraphic(char *fileName){
+  Graphic * graphic = loadGraphic(fileName);
+    int width = graphic->width, height = graphic->height, Xorigem= width/10, Yorigem=height - (height/10);
+	cairo_surface_t *surface;
+    //Aqui comparamos o tipo de arquivo e assim diferenciamos a surface
+    if (!(strcmp (graphic->format, "png"))){
+		    surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height); //passa pra png !
+    }
+    else if (!(strcmp (graphic->format, "pdf"))){
+		    surface = cairo_pdf_surface_create(graphic->fileName,width,height); //passa pra pdf !
+    }  
+	
+    cairo_t *context = cairo_create(surface);
+    //Imagem de fundo
+    designBackground(context, width, height);
+    //Desenha os Eixos 
+    designXAxis(context, width, height);
+    designYAxis(context, width, height);
+    //Função de  Texto	
+    designText(context, graphic, width, height);
+    
+                /*----Escolher o tipo de Gráfico------- */
+    
+    
+    switch(graphic->type){
+    	case 0: designPoints(context, graphic, Xorigem, Yorigem); //Grafico de pontos.
+    	break;
+    	case 1: designLines(context, graphic, Xorigem, Yorigem); // Gráfico com linha 
+    	break;
+    	case 2: designArea(context, graphic, Yorigem); // Gráfico com área
+    	break;
+    
+    }
+    //Aqui realizamos outra comparação, agr para finalizar a passagem para pdf ou png !     
+    if (!(strcmp (graphic->format, "png"))){
+		cairo_surface_write_to_png(surface, graphic->fileName); //png !
+    }
+    else if (!(strcmp (graphic->format, "pdf"))){
+		cairo_show_page(context); //pdf !
+    }
+    
+    cairo_destroy(context);
+    cairo_surface_destroy(surface);
+
+
+}

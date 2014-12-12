@@ -1,5 +1,0 @@
-project(Jansson101)
-SET (CMAKE_C_COMPILER "${DEVROOT}/usr/bin/clang")
-add_executable(grapsGen main.c drawing.c storage.c)
-target_link_libraries(grapsGen jansson)
-target_link_libraries(grapsGen cairo)

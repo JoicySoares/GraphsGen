@@ -17,4 +17,4 @@ void designArea(cairo_t * context, Graphic * graphic, int Yorigem);
 
 void designText(cairo_t * context, Graphic * graphic, int height, int width);
 
-//void createGraphic(char *fileName);
+void createGraphic(char *fileName);
